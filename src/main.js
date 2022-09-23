@@ -45,8 +45,7 @@ async function mountData(searchValue) {
     refs.moreBtn.addEventListener('click', () => {
       loadMoreCards(searchValue);
     });
-    if (data.hits.length === 0 || searchValue === '') {
-      refs.moreBtn.classList.add('visually-hidden');
+    if (data.hits.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
@@ -56,6 +55,7 @@ async function mountData(searchValue) {
     });
     doLightbox();
   } catch (error) {
+    refs.moreBtn.classList.add('visually-hidden');
     console.log('error', error);
   }
 }
@@ -90,35 +90,6 @@ function createCardMarkup({
 </div>`
   );
 }
-// const photoData = {
-//   webformatURL,
-//   largeImageURL,
-//   tags,
-//   likes,
-//   views,
-//   comments,
-//   downloads,
-// };
-// function createMarkup(photoData) {
-//   const dataArr = photoData.data.hits;
-//   return dataArr.forEach((photoData) => {return`<div class="photo-card">
-//     <a class='link-img' href=${largeImageURL}><img src=${webformatURL} alt=${tags} loading="lazy" class="card-img" height="80%"/></a>
-//   <div class="info">
-//     <p class="info-item">
-//       <b class="info-label">Likes </b><span class="info-span">${likes}</span>
-//     </p>
-//     <p class="info-item">
-//       <b class="info-label">Views </b><span class="info-span">${views}</span>
-//     </p>
-//     <p class="info-item">
-//       <b class="info-label">Comments </b><span class="info-span">${comments}</span>
-//     </p>
-//     <p class="info-item">
-//       <b class="info-label">Downloads </b><span class="info-span">${downloads}</span>
-//     </p>
-//   </div>
-// </div>`;
-// }).join("")
 
 function doLightbox() {
   const linkImg = document.querySelector('.link-img');
