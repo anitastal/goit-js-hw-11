@@ -19,9 +19,10 @@ refs.formEl.addEventListener('submit', onSubmit);
 async function loadMoreCards(searchValue) {
   page += 1;
   const data = await getPhoto(searchValue, page);
-  data.hits.forEach(photo => {
-    createCardMarkup(photo);
-  });
+  createGallaryMarkup(data.hits);
+  // data.hits.forEach(photo => {
+  //   createCardMarkup(photo);
+  // });
   if (page === totalPages) {
     refs.moreBtn.classList.add('visually-hidden');
   }
@@ -34,25 +35,33 @@ function onSubmit(event) {
   clearMarkup(refs.galleryEl);
 
   const searchValue = event.currentTarget[0].value.trim();
+
+  if (searchValue === '') {
+    alert('Try to write something');
+  }
   mountData(searchValue);
 }
 
 async function mountData(searchValue) {
   try {
     const data = await getPhoto(searchValue, page);
-
     refs.moreBtn.classList.remove('visually-hidden');
-    refs.moreBtn.addEventListener('click', () => {
+    const moreBtnClbc = () => {
       loadMoreCards(searchValue);
-    });
+    };
+    refs.moreBtn.removeEventListener('click', moreBtnClbc);
+
+    refs.moreBtn.addEventListener('click', moreBtnClbc);
+
     if (data.hits.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     } else Notiflix.Notify.info(`Hooray! We found ${data.totalHits} images.`);
-    data.hits.forEach(photo => {
-      createCardMarkup(photo);
-    });
+    createGallaryMarkup(data.hits);
+    // data.hits.forEach(photo => {
+    //   createCardMarkup(photo);
+    // });
     doLightbox();
   } catch (error) {
     refs.moreBtn.classList.add('visually-hidden');
@@ -60,18 +69,18 @@ async function mountData(searchValue) {
   }
 }
 
-function createCardMarkup({
-  webformatURL,
-  largeImageURL,
-  tags,
-  likes,
-  views,
-  comments,
-  downloads,
-}) {
-  refs.galleryEl.insertAdjacentHTML(
-    'beforeend',
-    `<div class="photo-card">
+function createGallaryMarkup(cardsArr) {
+  const markUp = cardsArr
+    .map(
+      ({
+        webformatURL,
+        largeImageURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => `<div class="photo-card">
     <a class='link-img' href=${largeImageURL}><img src=${webformatURL} alt=${tags} loading="lazy" class="card-img" height="80%"/></a>
   <div class="info">
     <p class="info-item">
@@ -88,8 +97,46 @@ function createCardMarkup({
     </p>
   </div>
 </div>`
-  );
+    )
+    .join('');
+
+  refs.galleryEl.insertAdjacentHTML('beforeend', markUp);
 }
+
+// function createCardMarkup({
+//   webformatURL,
+//   largeImageURL,
+//   tags,
+//   likes,
+//   views,
+//   comments,
+//   downloads,
+// }) {
+//   refs.galleryEl.insertAdjacentHTML(
+//     'beforeend',
+//     `<div class="photo-card">
+//     <a class='link-img' href=${largeImageURL}><img src=${webformatURL} alt=${tags} loading="lazy" class="card-img" height="80%"/></a>
+//   <div class="info">
+//     <p class="info-item">
+//       <b class="info-label">Likes </b><span class="info-span">${likes}</span>
+//     </p>
+//     <p class="info-item">
+//       <b class="info-label">Views </b><span class="info-span">${views}</span>
+//     </p>
+//     <p class="info-item">
+//       <b class="info-label">Comments </b><span class="info-span">${comments}</span>
+//     </p>
+//     <p class="info-item">
+//       <b class="info-label">Downloads </b><span class="info-span">${downloads}</span>
+//     </p>
+//   </div>
+// </div>`
+//   );
+// }
+
+// function updatePage(el, markup = '') {
+//   el.innerHTML = markup;
+// }
 
 function doLightbox() {
   const linkImg = document.querySelector('.link-img');
