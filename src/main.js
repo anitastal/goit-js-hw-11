@@ -11,10 +11,14 @@ const refs = {
 };
 
 let page = 1;
-
+let searchValue = '';
 const totalPages = Math.ceil(500 / 40);
 
 refs.formEl.addEventListener('submit', onSubmit);
+
+function moreBtnClbc() {
+  loadMoreCards(searchValue);
+}
 
 async function loadMoreCards(searchValue) {
   page += 1;
@@ -34,7 +38,7 @@ function onSubmit(event) {
 
   clearMarkup(refs.galleryEl);
 
-  const searchValue = event.currentTarget[0].value.trim();
+  searchValue = event.currentTarget[0].value.trim();
 
   if (searchValue === '') {
     alert('Try to write something');
@@ -46,9 +50,7 @@ async function mountData(searchValue) {
   try {
     const data = await getPhoto(searchValue, page);
     refs.moreBtn.classList.remove('visually-hidden');
-    const moreBtnClbc = () => {
-      loadMoreCards(searchValue);
-    };
+
     refs.moreBtn.removeEventListener('click', moreBtnClbc);
 
     refs.moreBtn.addEventListener('click', moreBtnClbc);
@@ -103,6 +105,23 @@ function createGallaryMarkup(cardsArr) {
   refs.galleryEl.insertAdjacentHTML('beforeend', markUp);
 }
 
+function doLightbox() {
+  const linkImg = document.querySelector('.link-img');
+  linkImg.addEventListener('click', openModal);
+
+  function openModal(event) {
+    event.preventDefault();
+  }
+
+  let lightbox = new SimpleLightbox('.photo-card a', {
+    captionDelay: 250,
+  });
+}
+
+function clearMarkup(element) {
+  element.innerHTML = '';
+}
+
 // function createCardMarkup({
 //   webformatURL,
 //   largeImageURL,
@@ -137,20 +156,3 @@ function createGallaryMarkup(cardsArr) {
 // function updatePage(el, markup = '') {
 //   el.innerHTML = markup;
 // }
-
-function doLightbox() {
-  const linkImg = document.querySelector('.link-img');
-  linkImg.addEventListener('click', openModal);
-
-  function openModal(event) {
-    event.preventDefault();
-  }
-
-  let lightbox = new SimpleLightbox('.photo-card a', {
-    captionDelay: 250,
-  });
-}
-
-function clearMarkup(element) {
-  element.innerHTML = '';
-}
